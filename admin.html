@@ -1,67 +1,42 @@
-
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin - Shayan Islamic Center</title>
-<style>
-body{font-family:system-ui;background:#0f172a;color:white;padding:15px;max-width:700px;margin:auto}
-input,textarea,select{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:0;box-sizing:border-box}
-button{padding:12px;background:#22c55e;color:#000;font-weight:bold;border:0;border-radius:8px;width:100%;margin-top:8px}
-.card{background:#1e293b;padding:12px;border-radius:12px;margin:10px 0}
-img.poster{width:100%;border-radius:10px;margin-top:8px}
-#panel{display:none}
-</style>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Full Admin</title>
+<style>body{font-family:system-ui;background:#0f172a;color:#fff;padding:15px;max-width:700px;margin:auto}input,textarea{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:0}button{padding:12px;background:#22c55e;color:#000;font-weight:bold;border:0;border-radius:8px;width:100%;margin-top:8px}.card{background:#1e293b;padding:12px;border-radius:12px;margin:10px 0}img{width:100%;border-radius:8px}#panel{display:none}</style>
 </head>
 <body>
-<h2>شایان اسلامک سینٹر - مکمل ایڈمن</h2>
-<div id="login">
-<input type="password" id="pass" placeholder="پاسورڈ">
-<button onclick="check()">لاگ ان</button>
-</div>
+<h2>Shayan - Full Control Admin</h2>
+<div id="login"><input type="password" id="pass" placeholder="Password"><button onclick="if(pass.value==='shayan123'){login.style.display='none';panel.style.display='block';load() }else alert('Ghalat')">Login</button></div>
 <div id="panel">
-<select id="type">
-<option value="poster">پوسٹر / تصویر</option>
-<option value="ayat">آیت + ترجمہ</option>
-<option value="pdf">قرآن PDF لنک</option>
-<option value="elan">اعلان</option>
-</select>
+<h3>🎨 Website Graphics Change</h3>
+<input id="g_title" placeholder="Website Title (Shayan Islamic Center)">
+<input id="g_tagline" placeholder="Tagline">
+<input id="g_heroTitle" placeholder="Hero Title (Welcome...)">
+<input id="g_color" type="color" value="#0d3b2e"> Color Change
+<input type="file" id="g_heroBg" accept="image/*"> Hero Background Image
+<button onclick="saveSettings()">Graphics Save Karo</button>
+<hr>
+<h3>🖼️ Poster / Ayat / Elan Lagao</h3>
 <input type="file" id="imgFile" accept="image/*">
-<input id="title" placeholder="عنوان / آیت">
-<textarea id="desc" placeholder="تفصیل / ترجمہ / PDF لنک"></textarea>
-<button onclick="addPost()">ویب سائٹ پر لگائیں</button>
+<input id="title" placeholder="Title / Ayat">
+<textarea id="desc" placeholder="Tafseel / Tarjuma"></textarea>
+<button onclick="addPost()">Post Lagao</button>
 <div id="list"></div>
-<br><a href="index.html" style="color:#22c55e">ویب سائٹ دیکھیں</a>
+<a href="index.html" style="color:#22c55e">Website Dekho</a>
 </div>
 <script>
-function check(){if(pass.value==='shayan123'){login.style.display='none';panel.style.display='block';show();}else alert('غلط پاسورڈ')}
-function addPost(){
- const file=document.getElementById('imgFile').files[0];
- const t=document.getElementById('type').value;
- const title=document.getElementById('title').value;
- const desc=document.getElementById('desc').value;
- if(file){
-   const reader=new FileReader();
-   reader.onload=function(e){
-     savePost(t,title,desc,e.target.result);
-   }; reader.readAsDataURL(file);
- } else { savePost(t,title,desc,''); }
+function saveSettings(){
+ let file=document.getElementById('g_heroBg').files[0];
+ const save=(bg)=>{
+  let s={title:g_title.value, tagline:g_tagline.value, heroTitle:g_heroTitle.value, color:g_color.value, heroBg:bg||JSON.parse(localStorage.getItem('shayan_settings')||'{}').heroBg};
+  localStorage.setItem('shayan_settings',JSON.stringify(s)); alert('Graphics Save Ho Gaya!');
+ };
+ if(file){let r=new FileReader();r.onload=e=>save(e.target.result);r.readAsDataURL(file);} else save();
 }
-function savePost(type,title,desc,img){
- let data=JSON.parse(localStorage.getItem('shayan_all')||'[]');
- data.unshift({type,title,desc,img,date:new Date().toLocaleDateString()});
- localStorage.setItem('shayan_all',JSON.stringify(data));
- document.getElementById('title').value='';document.getElementById('desc').value='';
- show();
-}
-function show(){
- let data=JSON.parse(localStorage.getItem('shayan_all')||'[]');
- let h='';
- data.forEach(x=>{
-  h+=`<div class="card"><b>${x.type.toUpperCase()}: ${x.title}</b><br>${x.desc}<br><small>${x.date}</small>${x.img?`<img class="poster" src="${x.img}">`:''}</div>`;
- });
- list.innerHTML=h;
-}
+function load(){let s=JSON.parse(localStorage.getItem('shayan_settings')||'{}'); if(s.title) g_title.value=s.title; if(s.tagline) g_tagline.value=s.tagline; if(s.heroTitle) g_heroTitle.value=s.heroTitle; show();}
+function addPost(){const f=imgFile.files[0];const t=title.value;const d=desc.value;const sv=(img)=>{let a=JSON.parse(localStorage.getItem('shayan_all')||'[]');a.unshift({title:t,desc:d,img:img,type:'Poster',date:new Date().toLocaleDateString()});localStorage.setItem('shayan_all',JSON.stringify(a));title.value='';desc.value='';show();};if(f){let r=new FileReader();r.onload=e=>sv(e.target.result);r.readAsDataURL(f);}else sv('');}
+function show(){let a=JSON.parse(localStorage.getItem('shayan_all')||'[]');let h='';a.forEach((x,i)=>{h+=`<div class=card><b>${x.title}</b><br>${x.desc}${x.img?`<img src=${x.img}>`:''}<br><button onclick="del(${i})" style=background:red;color:white>Delete</button></div>`});list.innerHTML=h;}
+function del(i){let a=JSON.parse(localStorage.getItem('shayan_all')||'[]');a.splice(i,1);localStorage.setItem('shayan_all',JSON.stringify(a));show();}
 </script>
 </body>
- </html>
+</html>
