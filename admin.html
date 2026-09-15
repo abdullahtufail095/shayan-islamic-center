@@ -1,66 +1,67 @@
+
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shayan Islamic Center - Admin</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin - Shayan Islamic Center</title>
 <style>
-body{font-family:system-ui;background:#0f172a;color:white;padding:20px;max-width:600px;margin:auto}
-input,textarea{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:0}
-button{padding:12px 20px;background:#22c55e;color:black;font-weight:bold;border:0;border-radius:8px;width:100%;margin-top:10px}
-.card{background:#1e293b;padding:15px;border-radius:12px;margin:10px 0}
+body{font-family:system-ui;background:#0f172a;color:white;padding:15px;max-width:700px;margin:auto}
+input,textarea,select{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:0;box-sizing:border-box}
+button{padding:12px;background:#22c55e;color:#000;font-weight:bold;border:0;border-radius:8px;width:100%;margin-top:8px}
+.card{background:#1e293b;padding:12px;border-radius:12px;margin:10px 0}
+img.poster{width:100%;border-radius:10px;margin-top:8px}
 #panel{display:none}
 </style>
 </head>
 <body>
-<h2>شایان اسلامک سینٹر - ایڈمن پینل</h2>
+<h2>شایان اسلامک سینٹر - مکمل ایڈمن</h2>
 <div id="login">
-<input type="password" id="pass" placeholder="پاسورڈ لکھیں">
+<input type="password" id="pass" placeholder="پاسورڈ">
 <button onclick="check()">لاگ ان</button>
-<p style="font-size:12px;color:#94a3b8">Default password: shayan123</p>
 </div>
-
 <div id="panel">
-<h3>روزانہ آیت شامل کریں</h3>
-<input id="arabic" placeholder="آیت عربی میں">
-<textarea id="tarjuma" placeholder="ترجمہ اردو میں"></textarea>
-<input id="ref" placeholder="سورہ - حوالہ مثلاً البقرہ 255">
-<button onclick="add()">محفوظ کریں</button>
-<button onclick="clearAll()" style="background:#ef4444;color:white">سب ڈیلیٹ کریں</button>
+<select id="type">
+<option value="poster">پوسٹر / تصویر</option>
+<option value="ayat">آیت + ترجمہ</option>
+<option value="pdf">قرآن PDF لنک</option>
+<option value="elan">اعلان</option>
+</select>
+<input type="file" id="imgFile" accept="image/*">
+<input id="title" placeholder="عنوان / آیت">
+<textarea id="desc" placeholder="تفصیل / ترجمہ / PDF لنک"></textarea>
+<button onclick="addPost()">ویب سائٹ پر لگائیں</button>
 <div id="list"></div>
-<hr>
-<p style="font-size:13px">یہ ڈیٹا اسی موبائل میں محفوظ رہے گا۔ ویب سائٹ پر دکھانے کے لیے ہم اسے index.html سے لنک کر دیں گے۔</p>
-<a href="index.html" style="color:#22c55e">ویب سائٹ دیکھیں</a>
+<br><a href="index.html" style="color:#22c55e">ویب سائٹ دیکھیں</a>
 </div>
-
 <script>
-function check(){
- if(document.getElementById('pass').value==='shayan123'){
-  document.getElementById('login').style.display='none';
-  document.getElementById('panel').style.display='block';
-  show();
- } else alert('غلط پاسورڈ');
+function check(){if(pass.value==='shayan123'){login.style.display='none';panel.style.display='block';show();}else alert('غلط پاسورڈ')}
+function addPost(){
+ const file=document.getElementById('imgFile').files[0];
+ const t=document.getElementById('type').value;
+ const title=document.getElementById('title').value;
+ const desc=document.getElementById('desc').value;
+ if(file){
+   const reader=new FileReader();
+   reader.onload=function(e){
+     savePost(t,title,desc,e.target.result);
+   }; reader.readAsDataURL(file);
+ } else { savePost(t,title,desc,''); }
 }
-function add(){
- let a=document.getElementById('arabic').value;
- let t=document.getElementById('tarjuma').value;
- let r=document.getElementById('ref').value;
- if(!a) return alert('آیت لکھیں');
- let data=JSON.parse(localStorage.getItem('shayan_ayat')||'[]');
- data.unshift({a,t,r,date:new Date().toLocaleDateString('ur-PK')});
- localStorage.setItem('shayan_ayat',JSON.stringify(data));
- document.getElementById('arabic').value='';document.getElementById('tarjuma').value='';document.getElementById('ref').value='';
+function savePost(type,title,desc,img){
+ let data=JSON.parse(localStorage.getItem('shayan_all')||'[]');
+ data.unshift({type,title,desc,img,date:new Date().toLocaleDateString()});
+ localStorage.setItem('shayan_all',JSON.stringify(data));
+ document.getElementById('title').value='';document.getElementById('desc').value='';
  show();
 }
 function show(){
- let data=JSON.parse(localStorage.getItem('shayan_ayat')||'[]');
- let html='';
- data.forEach((x,i)=>{
-  html+=`<div class="card"><b>${x.a}</b><br><br>${x.t}<br><small>${x.r} - ${x.date}</small></div>`;
+ let data=JSON.parse(localStorage.getItem('shayan_all')||'[]');
+ let h='';
+ data.forEach(x=>{
+  h+=`<div class="card"><b>${x.type.toUpperCase()}: ${x.title}</b><br>${x.desc}<br><small>${x.date}</small>${x.img?`<img class="poster" src="${x.img}">`:''}</div>`;
  });
- document.getElementById('list').innerHTML=html;
+ list.innerHTML=h;
 }
-function clearAll(){ if(confirm('سارا ڈیٹا ڈیلیٹ کر دوں؟')){localStorage.removeItem('shayan_ayat');show();}}
 </script>
 </body>
-  </html>
+ </html>
