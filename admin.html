@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shayan Islamic Center - Admin</title>
+<style>
+body{font-family:system-ui;background:#0f172a;color:white;padding:20px;max-width:600px;margin:auto}
+input,textarea{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:0}
+button{padding:12px 20px;background:#22c55e;color:black;font-weight:bold;border:0;border-radius:8px;width:100%;margin-top:10px}
+.card{background:#1e293b;padding:15px;border-radius:12px;margin:10px 0}
+#panel{display:none}
+</style>
+</head>
+<body>
+<h2>شایان اسلامک سینٹر - ایڈمن پینل</h2>
+<div id="login">
+<input type="password" id="pass" placeholder="پاسورڈ لکھیں">
+<button onclick="check()">لاگ ان</button>
+<p style="font-size:12px;color:#94a3b8">Default password: shayan123</p>
+</div>
+
+<div id="panel">
+<h3>روزانہ آیت شامل کریں</h3>
+<input id="arabic" placeholder="آیت عربی میں">
+<textarea id="tarjuma" placeholder="ترجمہ اردو میں"></textarea>
+<input id="ref" placeholder="سورہ - حوالہ مثلاً البقرہ 255">
+<button onclick="add()">محفوظ کریں</button>
+<button onclick="clearAll()" style="background:#ef4444;color:white">سب ڈیلیٹ کریں</button>
+<div id="list"></div>
+<hr>
+<p style="font-size:13px">یہ ڈیٹا اسی موبائل میں محفوظ رہے گا۔ ویب سائٹ پر دکھانے کے لیے ہم اسے index.html سے لنک کر دیں گے۔</p>
+<a href="index.html" style="color:#22c55e">ویب سائٹ دیکھیں</a>
+</div>
+
+<script>
+function check(){
+ if(document.getElementById('pass').value==='shayan123'){
+  document.getElementById('login').style.display='none';
+  document.getElementById('panel').style.display='block';
+  show();
+ } else alert('غلط پاسورڈ');
+}
+function add(){
+ let a=document.getElementById('arabic').value;
+ let t=document.getElementById('tarjuma').value;
+ let r=document.getElementById('ref').value;
+ if(!a) return alert('آیت لکھیں');
+ let data=JSON.parse(localStorage.getItem('shayan_ayat')||'[]');
+ data.unshift({a,t,r,date:new Date().toLocaleDateString('ur-PK')});
+ localStorage.setItem('shayan_ayat',JSON.stringify(data));
+ document.getElementById('arabic').value='';document.getElementById('tarjuma').value='';document.getElementById('ref').value='';
+ show();
+}
+function show(){
+ let data=JSON.parse(localStorage.getItem('shayan_ayat')||'[]');
+ let html='';
+ data.forEach((x,i)=>{
+  html+=`<div class="card"><b>${x.a}</b><br><br>${x.t}<br><small>${x.r} - ${x.date}</small></div>`;
+ });
+ document.getElementById('list').innerHTML=html;
+}
+function clearAll(){ if(confirm('سارا ڈیٹا ڈیلیٹ کر دوں؟')){localStorage.removeItem('shayan_ayat');show();}}
+</script>
+</body>
+  </html>
